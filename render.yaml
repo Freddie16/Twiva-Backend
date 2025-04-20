@@ -2,6 +2,7 @@ services:
   - type: web
     name: your-app-name
     runtime: php
+    env: php
     buildCommand: "cd trivia-backend && ./build.sh"
     startCommand: "cd trivia-backend && php -S 0.0.0.0:$PORT -t public"
     envVars:
