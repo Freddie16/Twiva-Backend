@@ -10,13 +10,15 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('game_sessions', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
-
+{
+    Schema::create('game_sessions', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('game_id')->constrained()->onDelete('cascade');
+        $table->string('code')->unique();
+        $table->enum('status', ['waiting', 'active', 'finished'])->default('waiting');
+        $table->timestamps();
+    });
+}
     /**
      * Reverse the migrations.
      */

@@ -20,9 +20,9 @@ class JoinGameSessionRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
-        return [
-            'session_code' => 'required|string|exists:game_sessions,session_code', // Must be a valid session code
-        ];
-    }
+{
+    return [
+        'session_code' => 'required|string|exists:game_sessions,code', // Changed to check 'code' column
+    ];
+}
 }

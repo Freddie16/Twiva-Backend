@@ -13,21 +13,20 @@ class Game extends Model
         'user_id',
         'title',
         'description',
-        'status',
+        'status'
     ];
-
-    // Relationships
-    public function creator()
+    
+    public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
-
+    
     public function questions()
     {
         return $this->hasMany(Question::class);
     }
-
-    public function sessions()
+    
+    public function sessions() // Removed :HasMany
     {
         return $this->hasMany(GameSession::class);
     }

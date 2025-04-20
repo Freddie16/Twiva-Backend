@@ -15,15 +15,15 @@ class GameSessionResource extends JsonResource
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
-    {
-        return [
-            'id' => $this->id,
-            'game' => new GameResource($this->whenLoaded('game')), // Include game details
-            'session_code' => $this->session_code,
-            'status' => $this->status,
-            'players' => GameSessionPlayerResource::collection($this->whenLoaded('players')), // Include players
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
-        ];
-    }
+{
+    return [
+        'id' => $this->id,
+        'game' => new GameResource($this->whenLoaded('game')),
+        'code' => $this->code, // Changed from session_code to code
+        'status' => $this->status,
+        'players' => GameSessionPlayerResource::collection($this->whenLoaded('players')),
+        'created_at' => $this->created_at,
+        'updated_at' => $this->updated_at,
+    ];
+}
 }

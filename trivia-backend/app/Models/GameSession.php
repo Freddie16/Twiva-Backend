@@ -12,28 +12,29 @@ class GameSession extends Model
 
     protected $fillable = [
         'game_id',
-        'session_code',
-        'status',
+        'code',
+        'status'
     ];
-
-    // Generate session code before creating
+    
     protected static function boot()
     {
         parent::boot();
-
+    
         static::creating(function ($session) {
-            $session->session_code = Str::random(6); // Simple 6-character code
+            $session->code = Str::upper(Str::random(6)); // Make it uppercase for better readability
         });
     }
-
     // Relationships
-    public function game()
-    {
-        return $this->belongsTo(Game::class);
-    }
+   // app/Models/GameSession.php
+   protected $with = ['game'];
 
-    public function players()
-    {
-        return $this->hasMany(GameSessionPlayer::class);
-    }
+   public function game() // Removed :BelongsTo
+   {
+       return $this->belongsTo(Game::class);
+   }
+
+   public function players()
+   {
+       return $this->hasMany(GameSessionPlayer::class);
+   }
 }

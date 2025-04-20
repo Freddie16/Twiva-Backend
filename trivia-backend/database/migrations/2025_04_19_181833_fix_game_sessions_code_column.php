@@ -11,19 +11,18 @@ return new class extends Migration
      */
     public function up()
 {
-    Schema::create('answers', function (Blueprint $table) {
-        $table->id();
-        $table->foreignId('question_id')->constrained()->onDelete('cascade');
-        $table->string('answer_text');
-        $table->boolean('is_correct')->default(false);
-        $table->timestamps();
+    Schema::table('game_sessions', function (Blueprint $table) {
+        if (Schema::hasColumn('game_sessions', 'session_code')) {
+            $table->dropColumn('session_code');
+        }
     });
 }
+
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('answers');
+        //
     }
 };

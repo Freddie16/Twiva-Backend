@@ -3,31 +3,51 @@
 namespace App\Http\Requests\Api\Game;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\Game; // Import the Game model
+use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdateGameRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
-    {
-        // Only the game creator can update the game
-        $game = $this->route('game'); // Get the game from the route parameters
-        return $game && $game->user_id === auth()->id();
-    }
+{
+    $game = $this->route('game');
+    return $game && $game->user_id === auth()->id();
+}
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            'title' => 'sometimes|required|string|max:255', // sometimes means optional
-            'description' => 'nullable|string',
-            'status' => 'sometimes|required|in:pending,in_progress,completed',
+            'title' => 'sometimes|string|max:255',
+            'description' => 'nullable|string|max:1000',
+            'status' => 'sometimes|in:draft,published,archived',
+            'questions' => 'sometimes|array',
+            'questions.*.id' => 'sometimes|exists:questions,id',
+            'questions.*.question_text' => 'sometimes|string|max:500',
+            'questions.*.points' => 'sometimes|integer|min:1|max:100',
+            'questions.*.answers' => 'sometimes|array|min:2',
+            'questions.*.answers.*.id' => 'sometimes|exists:answers,id',
+            'questions.*.answers.*.answer_text' => 'sometimes|string|max:255',
+            'questions.*.answers.*.is_correct' => 'sometimes|boolean',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        throw new HttpResponseException(
+            response()->json([
+                'success' => false,
+                'message' => 'Validation errors',
+                'errors' => $validator->errors()
+            ], 422)
+        );
+    }
+
+    protected function prepareForValidation()
+    {
+        if ($this->has('questions')) {
+            $this->merge([
+                'questions' => array_values($this->questions)
+            ]);
+        }
     }
 }
