@@ -40,21 +40,43 @@ class GameController extends Controller
     }
 }
 
+// GameController.php
 public function store(StoreGameRequest $request)
 {
     try {
-        $game = auth()->user()->games()->create($request->validated());
+        $validated = $request->validated();
         
+        $game = auth()->user()->games()->create([
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'status' => $validated['status']
+        ]);
+
+        foreach ($validated['questions'] as $questionData) {
+            $question = $game->questions()->create([
+                'question_text' => $questionData['question_text'],
+                'points' => $questionData['points']
+            ]);
+
+            foreach ($questionData['answers'] as $answerData) {
+                $question->answers()->create([
+                    'answer_text' => $answerData['answer_text'],
+                    'is_correct' => $answerData['is_correct']
+                ]);
+            }
+        }
+
         return response()->json([
             'success' => true,
-            'data' => new GameResource($game)
+            'data' => new GameResource($game->load('questions.answers'))
         ], 201);
         
     } catch (\Exception $e) {
+        \Log::error('Game creation failed: ' . $e->getMessage());
         return response()->json([
             'success' => false,
             'message' => 'Failed to create game',
-            'error' => $e->getMessage()
+            'error' => config('app.debug') ? $e->getMessage() : null
         ], 500);
     }
 }

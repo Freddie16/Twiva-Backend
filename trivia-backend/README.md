@@ -1,61 +1,9 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
-
-## About Laravel
-
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development/)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Gamification Trivia Platform BackendProject DescriptionThis is the Laravel backend for a Gamification Trivia Platform. It provides the API endpoints necessary for a frontend application (like the Flutter app we've been working on) to handle user authentication, manage trivia games (create, view), and manage game sessions (create, join, start, submit answers, view leaderboard).Technologies UsedFramework: Laravel (PHP)Authentication: Laravel Sanctum (for API token authentication)Database: (Assumed: MySQL or PostgreSQL)Package Manager: ComposerRequirementsPHP (version compatible with your Laravel version, typically 8.1 or higher)ComposerA Database server (MySQL, PostgreSQL, SQLite, etc.)Web server (Apache, Nginx, or use Laravel's built-in php artisan serve)InstallationClone the repository:git clone <your_backend_repo_url>
+cd your_backend_repo_directory
+Install Composer dependencies:composer install
+Copy the environment file:cp .env.example .env
+Configure your .env file:Open the .env file in a text editor.Set your database credentials (DB_CONNECTION, DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD).Configure your application URL (APP_URL).Ensure APP_DEBUG is set appropriately (true for development, false for production).Configure CORS if necessary (ensure your frontend origin is allowed - the HandleCors middleware should be enabled).Generate application key:php artisan key:generate
+Run database migrations:php artisan migrate
+(If you have seeders to populate the database with initial data, you can run php artisan db:seed)Install Laravel Sanctum:php artisan sanctum:install
+(Ensure the EnsureFrontendRequestsAreStateful and EncryptCookies middleware are uncommented in app/Http/Kernel.php if you plan to use cookie-based SPA authentication, though for mobile API it's usually token-based only).Run the development server:php artisan serve
+This will typically start the server at http://127.0.0.1:8000. If you are using a different setup (like Docker with Sail or a dedicated web server), configure it accordingly.API EndpointsAll API endpoints are prefixed with /api.Authentication (using Laravel Sanctum)POST /api/register - Register a new user.Request Body: name, username, email, password, password_confirmationResponse: User data and API token on success.POST /api/login - Log in an existing user.Request Body: email, passwordResponse: User data and API token on success.POST /api/logout - Log out the authenticated user (requires authentication token).Games (requires authentication token)GET /api/games - Get a list of games created by the authenticated user.Response: Array of Game resources.POST /api/games - Create a new game with questions and answers.Request Body: title, description (optional), questions (array of objects, each with question_text, points, answers array). Answers objects have answer_text, is_correct (boolean).Response: Created Game resource.GET /api/games/{game} - Get details for a specific game (requires ownership).Response: Game resource including questions and answers.PUT /api/games/{game} - Update a specific game (requires ownership).Request Body: Same as create, but updates existing game.Response: Updated Game resource.DELETE /api/games/{game} - Delete a specific game (requires ownership).Response: Success message.Game Sessions (requires authentication token)POST /api/games/{game}/sessions - Create a new game session for a specific game (requires game ownership).Response: Session ID and join code.POST /api/game-sessions/join - Join an existing game session using a session code.Request Body: session_codeResponse: Game Session resource with updated player list.GET /api/game-sessions/{gameSession} - Get details for a specific game session (requires ownership or being a player).Response: Game Session resource including game details, questions, and players.POST /api/game-sessions/{gameSession}/start - Start a game session (requires session ownership, session status 'waiting', and at least one player).Response: Success message and updated Game Session resource.POST /api/game-sessions/{gameSession}/answer - Submit an answer for the current question in a game session (requires being a player and session status 'active').Request Body: question_id, answer_id (optional, for skipping)Response: Success message, correctness, points awarded, and current score.POST /api/game-sessions/{gameSession}/finish - Finish a game session (requires session ownership and session status 'active').Response: Success message and updated Game Session resource.GET /api/game-sessions/{gameSession}/leaderboard - Get the leaderboard for a game session (requires ownership or being a player).Response: Array of Game Session Player resources ordered by score.Assumptions MadeThe backend uses Laravel Sanctum for API token authentication. Users register/login to receive a token, which must be sent in the Authorization: Bearer <token> header for protected routes.The database schema includes tables for users, games, questions, answers, game_sessions, game_session_players, and player_answers with appropriate relationships (e.g., a User has many Games, a Game has many Questions, a Question has many Answers, a GameSession belongs to a Game, a GameSession has many GameSessionPlayers, a GameSessionPlayer belongs to a User and a GameSession, a PlayerAnswer belongs to a GameSessionPlayer and a Question, optionally to an Answer).The necessary Laravel packages (laravel/sanctum, laravel/ui or similar for auth scaffolding if used, guzzlehttp/guzzle for http client if used) are installed via Composer.CORS is configured correctly to allow requests from your frontend's origin.The API routes are defined in routes/api.php.The controllers (GameController, GameSessionController, etc.) and API Resources (GameResource, GameSessionResource, GameSessionPlayerResource) are implemented to handle the logic and data transformation as partially seen in the snippets.Database connection and other environment variables are correctly configured in the .env file.
