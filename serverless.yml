@@ -1,0 +1,30 @@
+service: laravel-app
+
+provider:
+  name: aws
+  region: us-east-1
+  runtime: provided.al2
+  environment:
+    APP_ENV: production
+    APP_STORAGE: /tmp
+    LOG_CHANNEL: stderr
+    VIEW_COMPILED_PATH: /tmp
+    CACHE_DRIVER: array
+    SESSION_DRIVER: array
+
+plugins:
+  - ./vendor/bref/bref
+
+functions:
+  web:
+    handler: public/index.php
+    timeout: 28 # seconds
+    layers:
+      - ${bref:layer.php-81-fpm}
+    events:
+      - http: 'ANY /'
+      - http: 'ANY /{proxy+}'
+
+resources:
+  Resources:
+    # (Optional) Add your DB/Storage config here
