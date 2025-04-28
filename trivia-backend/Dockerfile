@@ -19,6 +19,7 @@ COPY --from=composer:2.7 /usr/bin/composer /usr/local/bin/composer
 COPY composer.json composer.lock ./
 
 # Install dependencies without running scripts
+
 RUN composer install --no-dev --no-interaction --no-scripts --optimize-autoloader
 
 # Copy the rest of the application files
@@ -46,3 +47,11 @@ ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf && \
     sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf && \
     a2enmod rewrite
+# Copy the entrypoint script into the container
+COPY entrypoint.sh /usr/local/bin/
+
+# Make the script executable
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+# Set the entrypoint
+ENTRYPOINT ["entrypoint.sh"]
