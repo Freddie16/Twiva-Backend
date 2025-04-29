@@ -7,24 +7,17 @@ use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvi
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
-use App\Models\GameSession; 
+use App\Models\Game;
+use App\Models\GameSession;
+use App\Models\Question;
+
 class RouteServiceProvider extends ServiceProvider
 {
-    /**
-     * Define your route model bindings, pattern filters, etc.
-     */
     public function boot(): void
     {
         $this->configureRateLimiting();
-
-        Route::model('game', \App\Models\Game::class);
+        $this->configureModelBindings();
         parent::boot();
-        Route::model('gameSession', GameSession::class);
-    
-    // Or if you need custom resolution logic:
-        Route::bind('gameSession', function ($value) {
-            return GameSession::findOrFail($value);
-        });
 
         $this->routes(function () {
             Route::middleware('api')
@@ -33,14 +26,17 @@ class RouteServiceProvider extends ServiceProvider
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
-                
-               
         });
     }
 
-    /**
-     * Configure the rate limiters for the application.
-     */
+    protected function configureModelBindings(): void
+    {
+        Route::model('game', Game::class);
+        Route::model('question', Question::class);
+        Route::bind('gameSession', fn($value) => GameSession::with(['game', 'players'])->findOrFail($value));
+        Route::bind('session', fn($value) => GameSession::with(['game', 'players'])->findOrFail($value));
+    }
+
     protected function configureRateLimiting(): void
     {
         RateLimiter::for('api', function (Request $request) {

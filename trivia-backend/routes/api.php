@@ -30,7 +30,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
     // Game owner routes
     Route::middleware('game.owner')->group(function() {
-        // Game routes
+        // Game routes (using implicit model binding)
         Route::apiResource('games', GameController::class)->names([
             'index' => 'api.games.index',
             'store' => 'api.games.store',
@@ -39,9 +39,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
             'destroy' => 'api.games.destroy'
         ]);
         
-        // Question routes
-        Route::post('/games/{game_id}/questions', [QuestionController::class, 'store'])
-            ->where('game_id', '[0-9]+');
+        // Question routes (use {game} instead of {game_id})
+        Route::post('/games/{game}/questions', [QuestionController::class, 'store'])
+            ->name('api.questions.store');
         Route::put('/questions/{question}', [QuestionController::class, 'update'])
             ->name('api.questions.update');
         Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])
