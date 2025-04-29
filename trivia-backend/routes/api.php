@@ -24,22 +24,22 @@ Route::post('/login', [AuthController::class, 'login']);
 
 // Protected routes (require authentication)
 Route::middleware(['auth:sanctum'])->group(function () {
-    // User routes (available to all authenticated users)
+    // User routes
     Route::get('/user', fn (Request $r) => $r->user())->name('api.user');
     Route::post('/logout', [AuthController::class, 'logout'])->name('api.logout');
     
-    // Game owner routes
+    // Game routes - index doesn't need ownership check
+    Route::get('/games', [GameController::class, 'index'])->name('api.games.index');
+    
+    // Game owner routes (only for operations that need ownership verification)
     Route::middleware('game.owner')->group(function() {
-        // Game routes (using implicit model binding)
-        Route::apiResource('games', GameController::class)->names([
-            'index' => 'api.games.index',
-            'store' => 'api.games.store',
-            'show' => 'api.games.show',
-            'update' => 'api.games.update',
-            'destroy' => 'api.games.destroy'
-        ]);
+        // Game CRUD routes (except index)
+        Route::post('/games', [GameController::class, 'store'])->name('api.games.store');
+        Route::get('/games/{game}', [GameController::class, 'show'])->name('api.games.show');
+        Route::put('/games/{game}', [GameController::class, 'update'])->name('api.games.update');
+        Route::delete('/games/{game}', [GameController::class, 'destroy'])->name('api.games.destroy');
         
-        // Question routes (use {game} instead of {game_id})
+        // Question routes
         Route::post('/games/{game}/questions', [QuestionController::class, 'store'])
             ->name('api.questions.store');
         Route::put('/questions/{question}', [QuestionController::class, 'update'])
@@ -47,7 +47,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/questions/{question}', [QuestionController::class, 'destroy'])
             ->name('api.questions.destroy');
         
-        // Session management routes (owner only)
+        // Session management
         Route::post('/games/{game}/sessions', [GameSessionController::class, 'store'])
             ->name('api.sessions.store');
         Route::post('/game-sessions/{session}/start', [GameSessionController::class, 'start'])
@@ -56,7 +56,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
             ->name('api.sessions.finish');
     });
     
-    // Session routes (available to all players)
+    // Player session routes
     Route::post('/game-sessions/join', [GameSessionController::class, 'join'])
         ->name('api.sessions.join');
     Route::get('/game-sessions/{session}', [GameSessionController::class, 'show'])
@@ -65,6 +65,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->name('api.sessions.answer');
     Route::get('/game-sessions/{session}/leaderboard', [GameSessionController::class, 'leaderboard'])
         ->name('api.sessions.leaderboard');
+});
     
     // Test route
     Route::get('/test-session/{gameSession}', function(GameSession $gameSession) {
@@ -74,4 +75,3 @@ Route::middleware(['auth:sanctum'])->group(function () {
             'owner' => $gameSession->game->user_id
         ]);
     });
-});
