@@ -19,6 +19,7 @@ COPY --from=composer:2.7 /usr/bin/composer /usr/local/bin/composer
 COPY composer.json composer.lock ./
 
 # Install dependencies without running scripts
+
 RUN composer install --no-dev --no-interaction --no-scripts --optimize-autoloader
 
 # Copy the rest of the application files
@@ -53,4 +54,4 @@ COPY entrypoint.sh /usr/local/bin/
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Set the entrypoint
-ENTRYPOINT ["entrypoint.sh"]    
+ENTRYPOINT ["entrypoint.sh"]
